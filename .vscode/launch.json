@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "hello_world",
+            "name": "lox",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug/hello_world",
+            "program": "${workspaceFolder}/build/debug/lox",
             "args": [],
             "cwd": "${workspaceFolder}",
             "MIMode": "lldb",

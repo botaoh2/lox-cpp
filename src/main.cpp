@@ -1,6 +1,20 @@
-#include <iostream>
+#include "pch.hpp"
 
-int main()
+#include "lox.hpp"
+
+int main(int argc, char** argv)
 {
-    std::cout << "hello lox\n";
+    if (argc > 2)
+    {
+        std::cerr << "Usage: lox [script]\n";
+        std::exit(1);
+    }
+    else if (argc == 2)
+    {
+        runFile(argv[1]);
+    }
+    else
+    {
+        runPrompt();
+    }
 }
