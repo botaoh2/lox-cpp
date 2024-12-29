@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 {
     if (argc > 2)
     {
-        std::cerr << "Usage: lox [script]\n";
+        fmt::println(stderr, "Usage: lox [script]");
         std::exit(1);
     }
     else if (argc == 2)

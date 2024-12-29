@@ -2,6 +2,8 @@
 
 #include "token.hpp"
 
+#include <sstream>
+
 static auto tokenTypeStrings = std::to_array({
     // Single-character tokens
     "LeftParen",
@@ -61,4 +63,18 @@ std::ostream& operator<<(std::ostream& os, TokenType type)
 std::ostream& operator<<(std::ostream& os, const Token& token)
 {
     return os << token.type << " " << token.lexeme << " " << token.line;
+}
+
+std::string format_as(TokenType type)
+{
+    std::stringstream ss;
+    ss << type;
+    return ss.str();
+}
+
+std::string format_as(const Token& token)
+{
+    std::stringstream ss;
+    ss << token;
+    return ss.str();
 }

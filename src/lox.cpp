@@ -14,7 +14,7 @@ static void run(std::string_view code)
     auto tokens = Scanner::scanTokens(code);
     for (const auto& token : tokens)
     {
-        std::cout << token << '\n';
+        fmt::println("{}", token);
     }
 }
 
@@ -23,7 +23,7 @@ void runFile(const char* filename)
     std::ifstream file(filename);
     if (!file)
     {
-        std::cerr << "Error opening file: " << filename << '\n';
+        fmt::println(stderr, "Error opening file: {}", filename);
         std::exit(1);
     }
 
@@ -51,5 +51,5 @@ void runPrompt()
 
 void error(int line, std::string_view message)
 {
-    std::cerr << "[line " << line << "] Error: " << message << std::endl;
+    fmt::println(stderr, "[line {}] Error: {}", line, message);
 }

@@ -63,3 +63,6 @@ struct Token
 
 std::ostream& operator<<(std::ostream& os, TokenType type);
 std::ostream& operator<<(std::ostream& os, const Token& token);
+
+std::string format_as(TokenType type);
+std::string format_as(const Token& token);
