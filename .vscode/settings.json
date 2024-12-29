@@ -1,0 +1,10 @@
+{
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "explorer.excludeGitIgnore": true,
+    // auto format cpp
+    "[cpp]": {
+        "editor.formatOnSave": true,
+        "files.insertFinalNewline": true,
+    }
+}

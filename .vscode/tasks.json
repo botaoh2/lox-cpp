@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "debug-build",
+            "type": "shell",
+            "command": "cmake -B build/debug -G Ninja -D CMAKE_BUILD_TYPE=Debug -D CMAKE_EXPORT_COMPILE_COMMANDS=ON && cmake --build build/debug",
+            "group": "build"
+        },
+        {
+            "label": "release-build",
+            "type": "shell",
+            "command": "cmake -B build/release -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_EXPORT_COMPILE_COMMANDS=ON && cmake --build build/release",
+            "group": "build"
+        }
+    ]
+}

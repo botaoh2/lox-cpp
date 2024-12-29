@@ -1,0 +1,13 @@
+IndentWidth: 4
+UseTab: Never
+DerivePointerAlignment: false
+PointerAlignment: Left
+AccessModifierOffset: -4
+BreakBeforeBraces: Allman
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+AllowShortFunctionsOnASingleLine: InlineOnly
+AlignAfterOpenBracket: BlockIndent
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ColumnLimit: 120
