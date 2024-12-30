@@ -3,6 +3,7 @@ set(SRC_FILES
 expr.cpp
 lox.cpp
 main.cpp
+parser.cpp
 printer.cpp
 scanner.cpp
 token.cpp

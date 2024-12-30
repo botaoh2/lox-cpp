@@ -2,6 +2,8 @@
 
 #include "lox.hpp"
 
+#include "parser.hpp"
+#include "printer.hpp"
 #include "scanner.hpp"
 
 #include <fstream>
@@ -12,10 +14,9 @@ bool hadError = false;
 static void run(std::string_view code)
 {
     auto tokens = Scanner::scanTokens(code);
-    for (const auto& token : tokens)
-    {
-        fmt::println("{}", token);
-    }
+    auto expr = Parser::parse(tokens);
+    if (expr)
+        fmt::println("{}", *expr);
 }
 
 void runFile(const char* filename)
@@ -49,7 +50,25 @@ void runPrompt()
     }
 }
 
+static void reportError(int line, std::string_view where, std::string_view message)
+{
+    fmt::println(stderr, "[line {}] Error{}: {}", line, where, message);
+    hadError = true;
+}
+
 void error(int line, std::string_view message)
 {
     fmt::println(stderr, "[line {}] Error: {}", line, message);
+}
+
+void error(const Token& token, std::string_view message)
+{
+    if (token.type == TokenType::Eof)
+    {
+        reportError(token.line, " at end", message);
+    }
+    else
+    {
+        reportError(token.line, fmt::format(" at '{}'", token.lexeme), message);
+    }
 }
