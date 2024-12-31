@@ -1,12 +1,14 @@
 
 set(SRC_FILES
 expr.cpp
+interpreter.cpp
 lox.cpp
 main.cpp
 parser.cpp
 printer.cpp
 scanner.cpp
 token.cpp
+value.cpp
 )
 
 add_executable(lox ${SRC_FILES})

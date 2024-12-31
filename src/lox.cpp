@@ -2,12 +2,15 @@
 
 #include "lox.hpp"
 
+#include "interpreter.hpp"
 #include "parser.hpp"
 #include "printer.hpp"
 #include "scanner.hpp"
 
 #include <fstream>
 #include <sstream>
+
+Interpreter interpreter;
 
 bool hadError = false;
 
@@ -16,7 +19,9 @@ static void run(std::string_view code)
     auto tokens = Scanner::scanTokens(code);
     auto expr = Parser::parse(tokens);
     if (expr)
-        fmt::println("{}", *expr);
+    {
+        interpreter.interpret(*expr);
+    }
 }
 
 void runFile(const char* filename)
