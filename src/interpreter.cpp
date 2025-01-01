@@ -58,6 +58,8 @@ Value Interpreter::eval(const Expr& expr)
         return eval(*unaryExpr);
     if (const auto* variableExpr = dynamic_cast<const Expr::Variable*>(&expr))
         return eval(*variableExpr);
+    if (const auto* assignExpr = dynamic_cast<const Expr::Assign*>(&expr))
+        return eval(*assignExpr);
 
     assert(0 && "unreachable");
     return Value();
@@ -167,6 +169,13 @@ Value Interpreter::eval(const Expr::Unary& expr)
 Value Interpreter::eval(const Expr::Variable& expr)
 {
     return m_global.get(expr.name);
+}
+
+Value Interpreter::eval(const Expr::Assign& expr)
+{
+    auto value = eval(*expr.value);
+    m_global.assign(expr.name, value);
+    return value;
 }
 
 bool Interpreter::isTruthy(const Value& value)

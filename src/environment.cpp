@@ -15,11 +15,18 @@ Value Environment::get(const Token& name) const
     throw RuntimeError(name, fmt::format("Undefined variable '{}'", name.lexeme));
 }
 
-bool Environment::define(const std::string& name, const Value& value)
+void Environment::define(const std::string& name, const Value& value)
 {
-    if (m_values.contains(name))
-        return false;
-
     m_values[name] = value;
-    return true;
+}
+
+void Environment::assign(const Token& name, const Value& value)
+{
+    if (auto it = m_values.find(name.lexeme); it != m_values.end())
+    {
+        it->second = value;
+        return;
+    }
+
+    throw RuntimeError(name, fmt::format("Undefined variable '{}'", name.lexeme));
 }

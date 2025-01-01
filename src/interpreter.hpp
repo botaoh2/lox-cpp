@@ -23,6 +23,7 @@ private:
     Value eval(const Expr::Literal& expr);
     Value eval(const Expr::Unary& expr);
     Value eval(const Expr::Variable& expr);
+    Value eval(const Expr::Assign& expr);
 
     bool isTruthy(const Value& value);
     void checkNumber(const Token& token, const Value& value);

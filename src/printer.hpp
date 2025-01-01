@@ -13,6 +13,7 @@ protected:
     void visitLiteral(const Expr::Literal& expr) override;
     void visitUnary(const Expr::Unary& expr) override;
     void visitVariable(const Expr::Variable& expr) override;
+    void visitAssign(const Expr::Assign& expr) override;
 };
 
 std::string format_as(const Expr& expr);

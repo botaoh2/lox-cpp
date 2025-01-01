@@ -71,14 +71,33 @@ std::unique_ptr<Stmt> Parser::printStatement()
 std::unique_ptr<Stmt> Parser::expressionStatement()
 {
     auto expr = expression();
-    auto stmt = std::make_unique<Stmt::Print>(std::move(expr));
+    auto stmt = std::make_unique<Stmt::Expression>(std::move(expr));
     consume(TokenType::Semicolon, "Expecting ';' after expression");
     return stmt;
 }
 
 std::unique_ptr<Expr> Parser::expression()
 {
-    return equality();
+    return assignment();
+}
+
+std::unique_ptr<Expr> Parser::assignment()
+{
+    auto left = equality();
+    if (match({TokenType::Equal}))
+    {
+        const Token& equalToken = previous();
+        auto value = assignment();
+
+        if (auto variableExpr = dynamic_cast<Expr::Variable*>(left.get()); variableExpr != nullptr)
+        {
+            return std::make_unique<Expr::Assign>(variableExpr->name, std::move(value));
+        }
+
+        error(equalToken, "Invalid assignment target");
+    }
+
+    return left;
 }
 
 std::unique_ptr<Expr> Parser::equality()

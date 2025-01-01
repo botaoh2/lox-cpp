@@ -28,5 +28,12 @@ class Basic(unittest.TestCase):
         self.assertEqual(result.stdout, 'nil\n')
         self.assertEqual(result.stderr, '')
 
+    def test_assignment(self):
+        result = run_script('assignment.lox')
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, '1\n1\n2\n2\n')
+        self.assertEqual(result.stderr, '')
+
 if __name__ == '__main__':
     unittest.main()
