@@ -8,21 +8,49 @@
 
 std::vector<std::unique_ptr<Stmt>> Parser::parse(const std::vector<Token>& tokens)
 {
-    std::vector<std::unique_ptr<Stmt>> program;
+    std::vector<std::unique_ptr<Stmt>> statements;
+
     try
     {
         Parser parser(tokens);
-        while (!parser.isAtEnd())
-        {
-            program.emplace_back(parser.statement());
-        }
+        statements = parser.program();
     }
     catch (const Error& e)
     {
         error(e.token, e.message);
     }
 
-    return program;
+    return statements;
+}
+
+std::vector<std::unique_ptr<Stmt>> Parser::program()
+{
+    std::vector<std::unique_ptr<Stmt>> statements;
+    while (!isAtEnd())
+        statements.emplace_back(declaration());
+    return statements;
+}
+
+std::unique_ptr<Stmt> Parser::declaration()
+{
+    if (match({TokenType::Var}))
+        return varDeclaration();
+    return statement();
+}
+
+std::unique_ptr<Stmt> Parser::varDeclaration()
+{
+    const Token& name = consume(TokenType::Identifier, "Expecting variable name");
+    std::unique_ptr<Expr> expr;
+
+    if (match({TokenType::Equal}))
+    {
+        expr = expression();
+    }
+
+    auto stmt = std::make_unique<Stmt::Var>(name, std::move(expr));
+    consume(TokenType::Semicolon, "Expecting ';' after expression");
+    return stmt;
 }
 
 std::unique_ptr<Stmt> Parser::statement()
@@ -126,6 +154,9 @@ std::unique_ptr<Expr> Parser::primary()
     if (match({TokenType::Number, TokenType::String, TokenType::True, TokenType::False, TokenType::Nil}))
         return std::make_unique<Expr::Literal>(previous());
 
+    if (match({TokenType::Identifier}))
+        return std::make_unique<Expr::Variable>(previous());
+
     if (match({TokenType::LeftParen}))
     {
         auto expr = std::make_unique<Expr::Grouping>(expression());
@@ -202,11 +233,11 @@ void Parser::synchronize()
     }
 }
 
-void Parser::consume(TokenType expected, const char* message)
+const Token& Parser::consume(TokenType expected, const char* message)
 {
     const auto& token = peek();
     if (token.type != expected)
         throw Error(token, message);
 
-    advance();
+    return advance();
 }

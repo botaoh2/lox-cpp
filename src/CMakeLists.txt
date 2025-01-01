@@ -1,5 +1,6 @@
 
 set(SRC_FILES
+environment.cpp
 expr.cpp
 interpreter.cpp
 lox.cpp

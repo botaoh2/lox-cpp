@@ -25,6 +25,10 @@ private:
         assert(tokens.back().type == TokenType::Eof);
     }
 
+    std::vector<std::unique_ptr<Stmt>> program();
+
+    std::unique_ptr<Stmt> declaration();
+    std::unique_ptr<Stmt> varDeclaration();
     std::unique_ptr<Stmt> statement();
     std::unique_ptr<Stmt> printStatement();
     std::unique_ptr<Stmt> expressionStatement();
@@ -43,7 +47,7 @@ private:
     const Token& peek() const;
     const Token& previous() const;
     void synchronize();
-    void consume(TokenType expected, const char* message);
+    const Token& consume(TokenType expected, const char* message);
 
     const std::vector<Token>& m_tokens;
     int m_current = 0;

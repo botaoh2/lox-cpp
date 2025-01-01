@@ -1,5 +1,6 @@
 #include "pch.hpp"
 
+#include "error.hpp"
 #include "interpreter.hpp"
 #include "token.hpp"
 #include "value.hpp"
@@ -20,6 +21,8 @@ void Interpreter::exec(const Stmt& stmt)
         return exec(*printStmt);
     if (const auto* exprStmt = dynamic_cast<const Stmt::Expression*>(&stmt))
         return exec(*exprStmt);
+    if (const auto* varStmt = dynamic_cast<const Stmt::Var*>(&stmt))
+        return exec(*varStmt);
 
     assert(0 && "unreachable");
 }
@@ -35,6 +38,14 @@ void Interpreter::exec(const Stmt::Expression& stmt)
     eval(*stmt.expression);
 }
 
+void Interpreter::exec(const Stmt::Var& stmt)
+{
+    Value value;
+    if (stmt.expression)
+        value = eval(*stmt.expression);
+    m_global.define(stmt.name.lexeme, value);
+}
+
 Value Interpreter::eval(const Expr& expr)
 {
     if (const auto* binaryExpr = dynamic_cast<const Expr::Binary*>(&expr))
@@ -45,6 +56,8 @@ Value Interpreter::eval(const Expr& expr)
         return eval(*literalExpr);
     if (const auto* unaryExpr = dynamic_cast<const Expr::Unary*>(&expr))
         return eval(*unaryExpr);
+    if (const auto* variableExpr = dynamic_cast<const Expr::Variable*>(&expr))
+        return eval(*variableExpr);
 
     assert(0 && "unreachable");
     return Value();
@@ -62,7 +75,7 @@ Value Interpreter::eval(const Expr::Binary& expr)
         if (leftValue.isString() && rightValue.isString())
             return Value(leftValue.getString() + rightValue.getString());
 
-        throw Error(expr.op, "Operands must be two numbers or two strings");
+        throw RuntimeError(expr.op, "Operands must be two numbers or two strings");
     }
 
     if (expr.op.type == TokenType::Less)
@@ -151,6 +164,11 @@ Value Interpreter::eval(const Expr::Unary& expr)
     return Value();
 }
 
+Value Interpreter::eval(const Expr::Variable& expr)
+{
+    return m_global.get(expr.name);
+}
+
 bool Interpreter::isTruthy(const Value& value)
 {
     if (value.isNil())
@@ -163,17 +181,17 @@ bool Interpreter::isTruthy(const Value& value)
 void Interpreter::checkNumber(const Token& token, const Value& value)
 {
     if (!value.isNumber())
-        throw Error(token, "Operand must be a number.");
+        throw RuntimeError(token, "Operand must be a number.");
 }
 
 void Interpreter::checkNumber(const Token& token, const Value& left, const Value& right)
 {
     if (!left.isNumber() || !right.isNumber())
-        throw Error(token, "Operands must be numbers.");
+        throw RuntimeError(token, "Operands must be numbers.");
 }
 
 void Interpreter::checkString(const Token& token, const Value& value)
 {
     if (!value.isString())
-        throw Error(token, "Operand must be a string.");
+        throw RuntimeError(token, "Operand must be a string.");
 }

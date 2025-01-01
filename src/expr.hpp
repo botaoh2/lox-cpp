@@ -11,6 +11,7 @@ public:
     class Grouping;
     class Literal;
     class Unary;
+    class Variable;
 
     virtual ~Expr() = default;
     virtual void accept(ExprVisitor& visitor) const = 0;
@@ -29,6 +30,7 @@ protected:
     virtual void visitGrouping(const Expr::Grouping& expr) = 0;
     virtual void visitLiteral(const Expr::Literal& expr) = 0;
     virtual void visitUnary(const Expr::Unary& expr) = 0;
+    virtual void visitVariable(const Expr::Variable& expr) = 0;
 };
 
 class Expr::Binary : public Expr
@@ -75,4 +77,14 @@ public:
 
     Token op;
     std::unique_ptr<Expr> right;
+};
+
+class Expr::Variable : public Expr
+{
+public:
+    Variable(const Token& name) : name(name) {}
+
+    void accept(ExprVisitor& visitor) const override { visitor.visitVariable(*this); }
+
+    Token name;
 };

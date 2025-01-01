@@ -22,6 +22,11 @@ void ExprPrinter::visitUnary(const Expr::Unary& expr)
     result = fmt::format("({} {})", expr.op.lexeme, *expr.right);
 }
 
+void ExprPrinter::visitVariable(const Expr::Variable& expr)
+{
+    result = fmt::format("{}", expr.name.lexeme);
+}
+
 std::string format_as(const Expr& expr)
 {
     ExprPrinter printer;

@@ -1,3 +1,4 @@
+#include "error.hpp"
 #include "pch.hpp"
 
 #include "lox.hpp"
@@ -18,9 +19,16 @@ static void run(std::string_view code)
 {
     auto tokens = Scanner::scanTokens(code);
     auto statements = Parser::parse(tokens);
-    for (const auto& stmt : statements)
+    try
     {
-        interpreter.interpret(*stmt);
+        for (const auto& stmt : statements)
+        {
+            interpreter.interpret(*stmt);
+        }
+    }
+    catch (const RuntimeError& e)
+    {
+        error(e.token, e.message);
     }
 }
 
@@ -63,7 +71,7 @@ static void reportError(int line, std::string_view where, std::string_view messa
 
 void error(int line, std::string_view message)
 {
-    fmt::println(stderr, "[line {}] Error: {}", line, message);
+    reportError(line, "", message);
 }
 
 void error(const Token& token, std::string_view message)
