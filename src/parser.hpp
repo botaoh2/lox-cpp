@@ -1,12 +1,13 @@
 #pragma once
 
 #include "expr.hpp"
+#include "stmt.hpp"
 #include "token.hpp"
 
 class Parser
 {
 public:
-    static std::unique_ptr<Expr> parse(const std::vector<Token>& tokens);
+    static std::vector<std::unique_ptr<Stmt>> parse(const std::vector<Token>& tokens);
 
 private:
     class Error
@@ -24,6 +25,10 @@ private:
         assert(tokens.back().type == TokenType::Eof);
     }
 
+    std::unique_ptr<Stmt> statement();
+    std::unique_ptr<Stmt> printStatement();
+    std::unique_ptr<Stmt> expressionStatement();
+
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();
@@ -38,6 +43,7 @@ private:
     const Token& peek() const;
     const Token& previous() const;
     void synchronize();
+    void consume(TokenType expected, const char* message);
 
     const std::vector<Token>& m_tokens;
     int m_current = 0;

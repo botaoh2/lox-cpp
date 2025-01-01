@@ -17,10 +17,10 @@ bool hadError = false;
 static void run(std::string_view code)
 {
     auto tokens = Scanner::scanTokens(code);
-    auto expr = Parser::parse(tokens);
-    if (expr)
+    auto statements = Parser::parse(tokens);
+    for (const auto& stmt : statements)
     {
-        interpreter.interpret(*expr);
+        interpreter.interpret(*stmt);
     }
 }
 

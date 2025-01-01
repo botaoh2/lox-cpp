@@ -4,10 +4,35 @@
 #include "token.hpp"
 #include "value.hpp"
 
-void Interpreter::interpret(const Expr& expr)
+void Interpreter::interpret(const Stmt& stmt)
 {
-    auto value = eval(expr);
+    exec(stmt);
+}
+
+Value Interpreter::interpret(const Expr& expr)
+{
+    return eval(expr);
+}
+
+void Interpreter::exec(const Stmt& stmt)
+{
+    if (const auto* printStmt = dynamic_cast<const Stmt::Print*>(&stmt))
+        return exec(*printStmt);
+    if (const auto* exprStmt = dynamic_cast<const Stmt::Expression*>(&stmt))
+        return exec(*exprStmt);
+
+    assert(0 && "unreachable");
+}
+
+void Interpreter::exec(const Stmt::Print& stmt)
+{
+    const Value value = eval(*stmt.expression);
     fmt::println("{}", value);
+}
+
+void Interpreter::exec(const Stmt::Expression& stmt)
+{
+    eval(*stmt.expression);
 }
 
 Value Interpreter::eval(const Expr& expr)

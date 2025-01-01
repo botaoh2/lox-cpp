@@ -1,12 +1,14 @@
 #pragma once
 
 #include "expr.hpp"
+#include "stmt.hpp"
 #include "value.hpp"
 
 class Interpreter
 {
 public:
-    void interpret(const Expr& expr);
+    void interpret(const Stmt& stmt);
+    Value interpret(const Expr& expr);
 
 private:
     class Error
@@ -17,6 +19,10 @@ private:
         Token token;
         std::string message;
     };
+
+    void exec(const Stmt& stmt);
+    void exec(const Stmt::Print& stmt);
+    void exec(const Stmt::Expression& stmt);
 
     Value eval(const Expr& expr);
     Value eval(const Expr::Binary& expr);

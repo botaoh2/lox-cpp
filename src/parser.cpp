@@ -6,18 +6,46 @@
 
 #include <set>
 
-std::unique_ptr<Expr> Parser::parse(const std::vector<Token>& tokens)
+std::vector<std::unique_ptr<Stmt>> Parser::parse(const std::vector<Token>& tokens)
 {
+    std::vector<std::unique_ptr<Stmt>> program;
     try
     {
         Parser parser(tokens);
-        return parser.expression();
+        while (!parser.isAtEnd())
+        {
+            program.emplace_back(parser.statement());
+        }
     }
     catch (const Error& e)
     {
         error(e.token, e.message);
-        return std::unique_ptr<Expr>{};
     }
+
+    return program;
+}
+
+std::unique_ptr<Stmt> Parser::statement()
+{
+    if (match({TokenType::Print}))
+        return printStatement();
+    return expressionStatement();
+}
+
+std::unique_ptr<Stmt> Parser::printStatement()
+{
+    auto expr = expression();
+    auto stmt = std::make_unique<Stmt::Print>(std::move(expr));
+    consume(TokenType::Semicolon, "Expecting ';' after value");
+    return stmt;
+}
+
+std::unique_ptr<Stmt> Parser::expressionStatement()
+{
+    auto expr = expression();
+    auto stmt = std::make_unique<Stmt::Print>(std::move(expr));
+    consume(TokenType::Semicolon, "Expecting ';' after expression");
+    return stmt;
 }
 
 std::unique_ptr<Expr> Parser::expression()
@@ -101,11 +129,7 @@ std::unique_ptr<Expr> Parser::primary()
     if (match({TokenType::LeftParen}))
     {
         auto expr = std::make_unique<Expr::Grouping>(expression());
-        if (!match({TokenType::RightParen}))
-        {
-            throw Error(peek(), "Expecting ')'");
-        }
-
+        consume(TokenType::RightParen, "Expecting ')'");
         return expr;
     }
 
@@ -114,7 +138,7 @@ std::unique_ptr<Expr> Parser::primary()
 
 bool Parser::isAtEnd() const
 {
-    return m_current >= m_tokens.size();
+    return m_current >= m_tokens.size() - 1;
 }
 
 const Token& Parser::advance()
@@ -176,4 +200,13 @@ void Parser::synchronize()
 
         advance();
     }
+}
+
+void Parser::consume(TokenType expected, const char* message)
+{
+    const auto& token = peek();
+    if (token.type != expected)
+        throw Error(token, message);
+
+    advance();
 }
