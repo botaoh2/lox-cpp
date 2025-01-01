@@ -31,6 +31,19 @@ std::vector<std::unique_ptr<Stmt>> Parser::program()
     return statements;
 }
 
+std::vector<std::unique_ptr<Stmt>> Parser::block()
+{
+    std::vector<std::unique_ptr<Stmt>> statements;
+
+    while (!isAtEnd() && peek().type != TokenType::RightBrace)
+    {
+        statements.emplace_back(declaration());
+    }
+
+    consume(TokenType::RightBrace, "Expect '}' after block.");
+    return statements;
+}
+
 std::unique_ptr<Stmt> Parser::declaration()
 {
     if (match({TokenType::Var}))
@@ -57,6 +70,8 @@ std::unique_ptr<Stmt> Parser::statement()
 {
     if (match({TokenType::Print}))
         return printStatement();
+    if (match({TokenType::LeftBrace}))
+        return std::make_unique<Stmt::Block>(block());
     return expressionStatement();
 }
 

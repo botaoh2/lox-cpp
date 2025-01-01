@@ -26,6 +26,7 @@ private:
     }
 
     std::vector<std::unique_ptr<Stmt>> program();
+    std::vector<std::unique_ptr<Stmt>> block();
 
     std::unique_ptr<Stmt> declaration();
     std::unique_ptr<Stmt> varDeclaration();

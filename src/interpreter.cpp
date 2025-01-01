@@ -1,9 +1,20 @@
+#include "environment.hpp"
 #include "pch.hpp"
 
 #include "error.hpp"
 #include "interpreter.hpp"
 #include "token.hpp"
 #include "value.hpp"
+
+class Finally
+{
+public:
+    Finally(std::function<void()> func) : m_func(func) {}
+    ~Finally() { m_func(); } // Automatically executes when going out of scope
+
+private:
+    std::function<void()> m_func;
+};
 
 void Interpreter::interpret(const Stmt& stmt)
 {
@@ -23,6 +34,8 @@ void Interpreter::exec(const Stmt& stmt)
         return exec(*exprStmt);
     if (const auto* varStmt = dynamic_cast<const Stmt::Var*>(&stmt))
         return exec(*varStmt);
+    if (const auto* blockStmt = dynamic_cast<const Stmt::Block*>(&stmt))
+        return exec(*blockStmt);
 
     assert(0 && "unreachable");
 }
@@ -43,7 +56,24 @@ void Interpreter::exec(const Stmt::Var& stmt)
     Value value;
     if (stmt.expression)
         value = eval(*stmt.expression);
-    m_global.define(stmt.name.lexeme, value);
+    m_environment->define(stmt.name.lexeme, value);
+}
+
+void Interpreter::exec(const Stmt::Block& stmt)
+{
+    executeBlock(stmt.statements, std::make_shared<Environment>(m_environment));
+}
+
+void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env)
+{
+    auto previous = m_environment;
+    Finally cleanup([&]() { m_environment = previous; });
+
+    m_environment = env;
+    for (const auto& stmt : statements)
+    {
+        exec(*stmt);
+    }
 }
 
 Value Interpreter::eval(const Expr& expr)
@@ -168,13 +198,13 @@ Value Interpreter::eval(const Expr::Unary& expr)
 
 Value Interpreter::eval(const Expr::Variable& expr)
 {
-    return m_global.get(expr.name);
+    return m_environment->get(expr.name);
 }
 
 Value Interpreter::eval(const Expr::Assign& expr)
 {
     auto value = eval(*expr.value);
-    m_global.assign(expr.name, value);
+    m_environment->assign(expr.name, value);
     return value;
 }
 

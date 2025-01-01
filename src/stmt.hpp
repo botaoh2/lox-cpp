@@ -8,6 +8,7 @@ public:
     class Expression;
     class Print;
     class Var;
+    class Block;
 
     virtual ~Stmt() = default;
 };
@@ -36,4 +37,13 @@ public:
 
     Token name;
     std::unique_ptr<Expr> expression;
+};
+
+class Stmt::Block : public Stmt
+{
+public:
+    Block() = default;
+    Block(std::vector<std::unique_ptr<Stmt>>&& statements) : statements(std::move(statements)) {}
+
+    std::vector<std::unique_ptr<Stmt>> statements;
 };

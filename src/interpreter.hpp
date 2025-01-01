@@ -16,6 +16,7 @@ private:
     void exec(const Stmt::Print& stmt);
     void exec(const Stmt::Expression& stmt);
     void exec(const Stmt::Var& stmt);
+    void exec(const Stmt::Block& stmt);
 
     Value eval(const Expr& expr);
     Value eval(const Expr::Binary& expr);
@@ -25,10 +26,13 @@ private:
     Value eval(const Expr::Variable& expr);
     Value eval(const Expr::Assign& expr);
 
+    void executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env);
+
     bool isTruthy(const Value& value);
     void checkNumber(const Token& token, const Value& value);
     void checkNumber(const Token& token, const Value& left, const Value& right);
     void checkString(const Token& token, const Value& value);
 
-    Environment m_global;
+    std::shared_ptr<Environment> m_global = std::make_shared<Environment>();
+    std::shared_ptr<Environment> m_environment = m_global;
 };
