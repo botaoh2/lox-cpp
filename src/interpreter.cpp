@@ -101,6 +101,8 @@ Value Interpreter::eval(const Expr& expr)
         return eval(*variableExpr);
     if (const auto* assignExpr = dynamic_cast<const Expr::Assign*>(&expr))
         return eval(*assignExpr);
+    if (const auto* logicalExpr = dynamic_cast<const Expr::Logical*>(&expr))
+        return eval(*logicalExpr);
 
     assert(0 && "unreachable");
     return Value();
@@ -217,6 +219,27 @@ Value Interpreter::eval(const Expr::Assign& expr)
     auto value = eval(*expr.value);
     m_environment->assign(expr.name, value);
     return value;
+}
+
+Value Interpreter::eval(const Expr::Logical& expr)
+{
+    Value left = eval(*expr.left);
+    if (expr.op.type == TokenType::And)
+    {
+        if (!isTruthy(left))
+            return left;
+        return eval(*expr.right);
+    }
+    else if (expr.op.type == TokenType::Or)
+    {
+        if (isTruthy(left))
+            return left;
+        return eval(*expr.right);
+    }
+    else
+    {
+        assert(0 && "unreachable");
+    }
 }
 
 bool Interpreter::isTruthy(const Value& value)

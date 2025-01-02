@@ -14,6 +14,7 @@ protected:
     void visitUnary(const Expr::Unary& expr) override;
     void visitVariable(const Expr::Variable& expr) override;
     void visitAssign(const Expr::Assign& expr) override;
+    void visitLogical(const Expr::Logical& expr) override;
 };
 
 std::string format_as(const Expr& expr);

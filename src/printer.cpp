@@ -32,6 +32,11 @@ void ExprPrinter::visitAssign(const Expr::Assign& expr)
     result = fmt::format("{} = {}", expr.name.lexeme, *expr.value);
 }
 
+void ExprPrinter::visitLogical(const Expr::Logical& expr)
+{
+    result = fmt::format("({} {} {})", expr.op.lexeme, *expr.left, *expr.right);
+}
+
 std::string format_as(const Expr& expr)
 {
     ExprPrinter printer;

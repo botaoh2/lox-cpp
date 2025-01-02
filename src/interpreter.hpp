@@ -26,6 +26,7 @@ private:
     Value eval(const Expr::Unary& expr);
     Value eval(const Expr::Variable& expr);
     Value eval(const Expr::Assign& expr);
+    Value eval(const Expr::Logical& expr);
 
     void executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env);
 
