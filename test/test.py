@@ -1,12 +1,15 @@
 import unittest
 import subprocess
 
+BUILD_FOLDER = 'build/debug/'
+TEST_FOLDER = 'test/'
+
 def run_script(script):
-    command = ['build/debug/lox', 'test/' + script]
+    command = [BUILD_FOLDER + 'lox', TEST_FOLDER + script]
     return subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
 def read_file(file):
-    with open('test/' + file) as file:
+    with open(TEST_FOLDER + file) as file:
         return file.read()
 
 class Basic(unittest.TestCase):
@@ -15,28 +18,21 @@ class Basic(unittest.TestCase):
         result = run_script('print.lox')
         
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, 'one\ntrue\n3\n')
+        self.assertEqual(result.stdout, read_file('print.txt'))
         self.assertEqual(result.stderr, '')
-    
-    def test_varstmt(self):
-        result = run_script('varstmt.lox')
+
+    def test_var(self):
+        result = run_script('var.lox')
 
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, '3\n')
-        self.assertEqual(result.stderr, '')
-    
-    def test_varempty(self):
-        result = run_script('varempty.lox')
-
-        self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, 'nil\n')
+        self.assertEqual(result.stdout, read_file('var.txt'))
         self.assertEqual(result.stderr, '')
 
     def test_assignment(self):
         result = run_script('assignment.lox')
 
         self.assertEqual(result.returncode, 0)
-        self.assertEqual(result.stdout, '1\n1\n2\n2\n')
+        self.assertEqual(result.stdout, read_file('assignment.txt'))
         self.assertEqual(result.stderr, '')
 
     def test_scope(self):
