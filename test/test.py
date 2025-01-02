@@ -55,6 +55,13 @@ class Basic(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, read_file('logical.txt'))
         self.assertEqual(result.stderr, '')
+    
+    def test_while(self):
+        result = run_script('while.lox')
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, read_file('while.txt'))
+        self.assertEqual(result.stderr, '')
 
 if __name__ == '__main__':
     unittest.main()

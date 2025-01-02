@@ -10,6 +10,7 @@ public:
     class Var;
     class Block;
     class If;
+    class While;
 
     virtual ~Stmt() = default;
 };
@@ -62,4 +63,18 @@ public:
     std::unique_ptr<Expr> condition;
     std::unique_ptr<Stmt> ifBranch;
     std::unique_ptr<Stmt> elseBranch;
+};
+
+class Stmt::While : public Stmt
+{
+public:
+    While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
+        : condition(std::move(condition)), body(std::move(body))
+    {
+        assert(this->condition);
+        assert(this->body);
+    }
+
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> body;
 };

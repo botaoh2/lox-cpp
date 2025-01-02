@@ -38,6 +38,8 @@ void Interpreter::exec(const Stmt& stmt)
         return exec(*blockStmt);
     if (const auto* ifStmt = dynamic_cast<const Stmt::If*>(&stmt))
         return exec(*ifStmt);
+    if (const auto* whileStmt = dynamic_cast<const Stmt::While*>(&stmt))
+        return exec(*whileStmt);
 
     assert(0 && "unreachable");
 }
@@ -73,6 +75,12 @@ void Interpreter::exec(const Stmt::If& stmt)
         exec(*stmt.ifBranch);
     else if (stmt.elseBranch)
         exec(*stmt.elseBranch);
+}
+
+void Interpreter::exec(const Stmt::While& stmt)
+{
+    while (isTruthy(eval(*stmt.condition)))
+        exec(*stmt.body);
 }
 
 void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env)

@@ -18,6 +18,7 @@ private:
     void exec(const Stmt::Var& stmt);
     void exec(const Stmt::Block& stmt);
     void exec(const Stmt::If& stmt);
+    void exec(const Stmt::While& stmt);
 
     Value eval(const Expr& expr);
     Value eval(const Expr::Binary& expr);
