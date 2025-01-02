@@ -12,6 +12,15 @@
             "type": "shell",
             "command": "cmake -B build/release -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_EXPORT_COMPILE_COMMANDS=ON && cmake --build build/release",
             "group": "build"
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "python3 test/test.py",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
         }
     ]
 }
