@@ -40,6 +40,8 @@ void Interpreter::exec(const Stmt& stmt)
         return exec(*ifStmt);
     if (const auto* whileStmt = dynamic_cast<const Stmt::While*>(&stmt))
         return exec(*whileStmt);
+    if (const auto* forStmt = dynamic_cast<const Stmt::For*>(&stmt))
+        return exec(*forStmt);
 
     assert(0 && "unreachable");
 }
@@ -81,6 +83,18 @@ void Interpreter::exec(const Stmt::While& stmt)
 {
     while (isTruthy(eval(*stmt.condition)))
         exec(*stmt.body);
+}
+
+void Interpreter::exec(const Stmt::For& stmt)
+{
+    if (stmt.initializer)
+        exec(*stmt.initializer);
+
+    while (isTruthy(eval(*stmt.condition)))
+    {
+        exec(*stmt.body);
+        eval(*stmt.step);
+    }
 }
 
 void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env)

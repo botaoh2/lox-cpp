@@ -11,6 +11,7 @@ public:
     class Block;
     class If;
     class While;
+    class For;
 
     virtual ~Stmt() = default;
 };
@@ -76,5 +77,27 @@ public:
     }
 
     std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> body;
+};
+
+class Stmt::For : public Stmt
+{
+public:
+    For(std::unique_ptr<Stmt> initializer,
+        std::unique_ptr<Expr> condition,
+        std::unique_ptr<Expr> step,
+        std::unique_ptr<Stmt> body)
+        : initializer(std::move(initializer)),
+          condition(std::move(condition)),
+          step(std::move(step)),
+          body(std::move(body))
+    {
+        assert(this->body);
+    }
+
+    std::unique_ptr<Stmt> initializer;
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Expr> step;
+
     std::unique_ptr<Stmt> body;
 };

@@ -68,6 +68,8 @@ std::unique_ptr<Stmt> Parser::varDeclaration()
 
 std::unique_ptr<Stmt> Parser::statement()
 {
+    if (match({TokenType::For}))
+        return forStatement();
     if (match({TokenType::If}))
         return ifStatement();
     if (match({TokenType::Print}))
@@ -117,6 +119,31 @@ std::unique_ptr<Stmt> Parser::whileStatement()
     auto body = statement();
 
     return std::make_unique<Stmt::While>(std::move(expr), std::move(body));
+}
+
+std::unique_ptr<Stmt> Parser::forStatement()
+{
+    consume(TokenType::LeftParen, "Expecting '(' after 'for'.");
+
+    std::unique_ptr<Stmt> initializer;
+    if (match({TokenType::Var}))
+        initializer = varDeclaration();
+    else if (!match({TokenType::Semicolon}))
+        initializer = expressionStatement();
+
+    std::unique_ptr<Expr> condition;
+    if (peek().type != TokenType::Semicolon)
+        condition = expression();
+    consume(TokenType::Semicolon, "Expecting ';' after for condition.");
+
+    std::unique_ptr<Expr> step;
+    if (peek().type != TokenType::RightParen)
+        step = expression();
+    consume(TokenType::RightParen, "Expecting ')' after for step.");
+
+    auto body = statement();
+
+    return std::make_unique<Stmt::For>(std::move(initializer), std::move(condition), std::move(step), std::move(body));
 }
 
 std::unique_ptr<Expr> Parser::expression()
