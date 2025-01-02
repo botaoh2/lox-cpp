@@ -145,6 +145,16 @@ Value Interpreter::eval(const Expr::Binary& expr)
         throw RuntimeError(expr.op, "Operands must be two numbers or two strings");
     }
 
+    if (expr.op.type == TokenType::EqualEqual)
+    {
+        return Value(isEqual(leftValue, rightValue));
+    }
+
+    if (expr.op.type == TokenType::BangEqual)
+    {
+        return Value(!isEqual(leftValue, rightValue));
+    }
+
     if (expr.op.type == TokenType::Less)
     {
         checkNumber(expr.op, leftValue, rightValue);
@@ -271,6 +281,22 @@ bool Interpreter::isTruthy(const Value& value)
     if (value.isBoolean())
         return value.getBoolean();
     return true;
+}
+
+bool Interpreter::isEqual(const Value& left, const Value& right)
+{
+    if (left.getType() != right.getType())
+        return false;
+    if (left.isNil())
+        return true;
+    if (left.isBoolean())
+        return left.getBoolean() == right.getBoolean();
+    if (left.isNumber())
+        return left.getNumber() == right.getNumber();
+    if (left.isString())
+        return left.getString() == right.getString();
+
+    assert(0 && "unreachable");
 }
 
 void Interpreter::checkNumber(const Token& token, const Value& value)

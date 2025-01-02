@@ -2,6 +2,14 @@
 
 #include <variant>
 
+enum class ValueType
+{
+    Nil = 0,
+    Boolean,
+    Number,
+    String
+};
+
 class Value
 {
 public:
@@ -9,6 +17,8 @@ public:
     Value(bool value) : m_variant(Boolean{value}) {}
     Value(double value) : m_variant(Number{value}) {}
     Value(const std::string& value) : m_variant(String{value}) {}
+
+    ValueType getType() const { return static_cast<ValueType>(m_variant.index()); }
 
     bool isNil() const { return std::holds_alternative<Nil>(m_variant); }
     bool isBoolean() const { return std::holds_alternative<Boolean>(m_variant); }

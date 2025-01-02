@@ -1,0 +1,12 @@
+print 1+1;              // 2
+print 1-1;              // 0
+print 2 * 3;            // 6
+print 4 / 2;            // 2
+print 1 + 2 * 3;        // 7
+print 1 < 2;            // true
+print "abc" == "abc";   // true
+print "123" != 123;     // true
+print 0 > -1;           // true
+print 0 >= 0;           // true
+print !true;            // false
+print !nil;             // true

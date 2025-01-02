@@ -202,7 +202,7 @@ std::unique_ptr<Expr> Parser::equality()
 {
     std::unique_ptr<Expr> expr = comparison();
 
-    while (match({TokenType::Bang, TokenType::BangEqual}))
+    while (match({TokenType::EqualEqual, TokenType::BangEqual}))
     {
         const Token& op = previous();
         std::unique_ptr<Expr> right = comparison();

@@ -33,6 +33,7 @@ private:
     void executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env);
 
     bool isTruthy(const Value& value);
+    bool isEqual(const Value& left, const Value& right);
     void checkNumber(const Token& token, const Value& value);
     void checkNumber(const Token& token, const Value& left, const Value& right);
     void checkString(const Token& token, const Value& value);
