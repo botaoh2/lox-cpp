@@ -68,6 +68,8 @@ std::unique_ptr<Stmt> Parser::varDeclaration()
 
 std::unique_ptr<Stmt> Parser::statement()
 {
+    if (match({TokenType::If}))
+        return ifStatement();
     if (match({TokenType::Print}))
         return printStatement();
     if (match({TokenType::LeftBrace}))
@@ -89,6 +91,20 @@ std::unique_ptr<Stmt> Parser::expressionStatement()
     auto stmt = std::make_unique<Stmt::Expression>(std::move(expr));
     consume(TokenType::Semicolon, "Expecting ';' after expression");
     return stmt;
+}
+
+std::unique_ptr<Stmt> Parser::ifStatement()
+{
+    consume(TokenType::LeftParen, "Expecting '(' after 'if'.");
+    auto expr = expression();
+    consume(TokenType::RightParen, "Expecting ')' after if condition.");
+    auto ifBranch = statement();
+
+    std::unique_ptr<Stmt> elseBranch;
+    if (match({TokenType::Else}))
+        elseBranch = statement();
+
+    return std::make_unique<Stmt::If>(std::move(expr), std::move(ifBranch), std::move(elseBranch));
 }
 
 std::unique_ptr<Expr> Parser::expression()

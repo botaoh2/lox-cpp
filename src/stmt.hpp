@@ -9,6 +9,7 @@ public:
     class Print;
     class Var;
     class Block;
+    class If;
 
     virtual ~Stmt() = default;
 };
@@ -46,4 +47,19 @@ public:
     Block(std::vector<std::unique_ptr<Stmt>>&& statements) : statements(std::move(statements)) {}
 
     std::vector<std::unique_ptr<Stmt>> statements;
+};
+
+class Stmt::If : public Stmt
+{
+public:
+    If(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> ifBranch, std::unique_ptr<Stmt> elseBranch = nullptr)
+        : condition(std::move(condition)), ifBranch(std::move(ifBranch)), elseBranch(std::move(elseBranch))
+    {
+        assert(this->condition);
+        assert(this->ifBranch);
+    }
+
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> ifBranch;
+    std::unique_ptr<Stmt> elseBranch;
 };

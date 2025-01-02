@@ -36,6 +36,8 @@ void Interpreter::exec(const Stmt& stmt)
         return exec(*varStmt);
     if (const auto* blockStmt = dynamic_cast<const Stmt::Block*>(&stmt))
         return exec(*blockStmt);
+    if (const auto* ifStmt = dynamic_cast<const Stmt::If*>(&stmt))
+        return exec(*ifStmt);
 
     assert(0 && "unreachable");
 }
@@ -62,6 +64,15 @@ void Interpreter::exec(const Stmt::Var& stmt)
 void Interpreter::exec(const Stmt::Block& stmt)
 {
     executeBlock(stmt.statements, std::make_shared<Environment>(m_environment));
+}
+
+void Interpreter::exec(const Stmt::If& stmt)
+{
+    auto condition = eval(*stmt.condition);
+    if (isTruthy(condition))
+        exec(*stmt.ifBranch);
+    else if (stmt.elseBranch)
+        exec(*stmt.elseBranch);
 }
 
 void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env)

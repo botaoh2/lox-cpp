@@ -1,0 +1,10 @@
+var green_light = false;
+
+if (green_light)
+    print "Go";
+else
+    print "Stop";
+
+green_light = true;
+if (green_light)
+    print "Go";
