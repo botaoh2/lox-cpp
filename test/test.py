@@ -85,6 +85,13 @@ class Basic(unittest.TestCase):
 
         clock = float(result.stdout)
         self.assertTrue(0 <= clock <= 1)
+    
+    def test_function(self):
+        result = run_script('function.lox')
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, read_file('function.txt'))
+        self.assertEqual(result.stderr, '')
 
 if __name__ == '__main__':
     unittest.main()

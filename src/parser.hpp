@@ -29,6 +29,7 @@ private:
     std::vector<std::unique_ptr<Stmt>> block();
 
     std::unique_ptr<Stmt> declaration();
+    std::unique_ptr<Stmt> funDeclaration();
     std::unique_ptr<Stmt> varDeclaration();
     std::unique_ptr<Stmt> statement();
     std::unique_ptr<Stmt> printStatement();
@@ -49,6 +50,7 @@ private:
     std::unique_ptr<Expr> call();
     std::unique_ptr<Expr> primary();
 
+    std::vector<Token> parameters();
     std::vector<std::unique_ptr<Expr>> arguments();
 
     bool isAtEnd() const;

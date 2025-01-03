@@ -46,9 +46,26 @@ std::vector<std::unique_ptr<Stmt>> Parser::block()
 
 std::unique_ptr<Stmt> Parser::declaration()
 {
+    if (match({TokenType::Fun}))
+        return funDeclaration();
     if (match({TokenType::Var}))
         return varDeclaration();
     return statement();
+}
+
+std::unique_ptr<Stmt> Parser::funDeclaration()
+{
+    const Token& name = consume(TokenType::Identifier, "Expecting identifier after 'fun'.");
+    consume(TokenType::LeftParen, "Expecting '(' after function name.");
+    std::vector<Token> params;
+    if (peek().type != TokenType::RightParen)
+        params = parameters();
+    consume(TokenType::RightParen, "Expecting ')' after function parameters.");
+    consume(TokenType::LeftBrace, "Expecting '{' after function declaration.");
+
+    auto body = block();
+
+    return std::make_unique<Stmt::Fun>(name, std::move(params), std::move(body));
 }
 
 std::unique_ptr<Stmt> Parser::varDeclaration()
@@ -301,6 +318,21 @@ std::unique_ptr<Expr> Parser::primary()
     }
 
     throw Error(peek(), "Expecting expression");
+}
+
+std::vector<Token> Parser::parameters()
+{
+    std::vector<Token> tokens;
+    tokens.emplace_back(consume(TokenType::Identifier, "Expecting identifier."));
+
+    while (match({TokenType::Comma}))
+    {
+        tokens.emplace_back(consume(TokenType::Identifier, "Expecting identifier."));
+        if (tokens.size() >= 255)
+            error(peek(), "Can't have more than 255 parameters.");
+    }
+
+    return tokens;
 }
 
 std::vector<std::unique_ptr<Expr>> Parser::arguments()

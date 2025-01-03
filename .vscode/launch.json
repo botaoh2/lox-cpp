@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/debug/lox",
-            "args": [],
+            "args": ["test/function.lox"],
             "cwd": "${workspaceFolder}",
             "MIMode": "lldb",
             "externalConsole": true,

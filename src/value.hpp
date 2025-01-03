@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stmt.hpp"
+
 #include <variant>
 
 enum class ValueType
@@ -18,9 +20,21 @@ class ICallable
 {
 public:
     virtual ~ICallable() = default;
-    virtual Value call(Interpreter& interpreter, const std::vector<Value>&) = 0;
+    virtual Value call(Interpreter& interpreter, const std::vector<Value>& arguments) = 0;
     virtual std::string toString() const = 0;
     virtual int arity() const = 0;
+};
+
+class LoxFunction : public ICallable
+{
+public:
+    LoxFunction(const Stmt::Fun& declaration) : declaration(declaration) {}
+
+    std::string toString() const override { return declaration.name.lexeme; }
+    int arity() const override { return declaration.params.size(); }
+    Value call(Interpreter& interpreter, const std::vector<Value>& arguments) override;
+
+    const Stmt::Fun& declaration;
 };
 
 class Value

@@ -8,6 +8,7 @@
 class Interpreter
 {
 public:
+    friend class LoxFunction;
     Interpreter();
 
     void interpret(const Stmt& stmt);
@@ -22,6 +23,7 @@ private:
     void exec(const Stmt::If& stmt);
     void exec(const Stmt::While& stmt);
     void exec(const Stmt::For& stmt);
+    void exec(const Stmt::Fun& stmt);
 
     Value eval(const Expr& expr);
     Value eval(const Expr::Binary& expr);

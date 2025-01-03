@@ -12,6 +12,7 @@ public:
     class If;
     class While;
     class For;
+    class Fun;
 
     virtual ~Stmt() = default;
 };
@@ -100,4 +101,17 @@ public:
     std::unique_ptr<Expr> step;
 
     std::unique_ptr<Stmt> body;
+};
+
+class Stmt::Fun : public Stmt
+{
+public:
+    Fun(const Token& name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body)
+        : name(name), params(std::move(params)), body(std::move(body))
+    {
+    }
+
+    Token name;
+    std::vector<Token> params;
+    std::vector<std::unique_ptr<Stmt>> body;
 };

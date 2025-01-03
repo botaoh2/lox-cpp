@@ -75,6 +75,8 @@ void Interpreter::exec(const Stmt& stmt)
         return exec(*whileStmt);
     if (const auto* forStmt = dynamic_cast<const Stmt::For*>(&stmt))
         return exec(*forStmt);
+    if (const auto* funStmt = dynamic_cast<const Stmt::Fun*>(&stmt))
+        return exec(*funStmt);
 
     assert(0 && "unreachable");
 }
@@ -128,6 +130,12 @@ void Interpreter::exec(const Stmt::For& stmt)
         exec(*stmt.body);
         eval(*stmt.step);
     }
+}
+
+void Interpreter::exec(const Stmt::Fun& stmt)
+{
+    auto functionValue = Value(std::make_shared<LoxFunction>(stmt));
+    m_environment->define(stmt.name.lexeme, functionValue);
 }
 
 void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env)
