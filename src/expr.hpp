@@ -14,6 +14,7 @@ public:
     class Variable;
     class Assign;
     class Logical;
+    class Call;
 
     virtual ~Expr() = default;
     virtual void accept(ExprVisitor& visitor) const = 0;
@@ -117,4 +118,19 @@ public:
     std::unique_ptr<Expr> left;
     Token op;
     std::unique_ptr<Expr> right;
+};
+
+class Expr::Call : public Expr
+{
+public:
+    Call(std::unique_ptr<Expr> callee, const Token& paren, std::vector<std::unique_ptr<Expr>>&& arguments)
+        : callee(std::move(callee)), paren(paren), arguments(std::move(arguments))
+    {
+    }
+
+    void accept(ExprVisitor& visitor) const override {}
+
+    std::unique_ptr<Expr> callee;
+    Token paren;
+    std::vector<std::unique_ptr<Expr>> arguments;
 };

@@ -1,5 +1,6 @@
 #include "pch.hpp"
 
+#include "interpreter.hpp"
 #include "value.hpp"
 
 std::string format_as(const Value& value)
@@ -12,6 +13,8 @@ std::string format_as(const Value& value)
         return fmt::format("{}", value.getNumber());
     if (value.isString())
         return value.getString();
+    if (value.isCallable())
+        return "Callable";
 
     assert(0 && "unreachable");
     return "";

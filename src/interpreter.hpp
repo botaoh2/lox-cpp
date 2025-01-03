@@ -8,6 +8,8 @@
 class Interpreter
 {
 public:
+    Interpreter();
+
     void interpret(const Stmt& stmt);
     Value interpret(const Expr& expr);
 
@@ -29,6 +31,7 @@ private:
     Value eval(const Expr::Variable& expr);
     Value eval(const Expr::Assign& expr);
     Value eval(const Expr::Logical& expr);
+    Value eval(const Expr::Call& expr);
 
     void executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env);
 

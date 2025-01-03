@@ -11,7 +11,7 @@ public:
     Environment() {}
     Environment(std::shared_ptr<Environment> parent) : m_parent(parent) {}
 
-    Value get(const Token& name) const;
+    const Value& get(const Token& name) const;
 
     void define(const std::string& name, const Value& value);
     void assign(const Token& name, const Value& value);

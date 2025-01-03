@@ -263,7 +263,26 @@ std::unique_ptr<Expr> Parser::unary()
         return std::make_unique<Expr::Unary>(op, std::move(right));
     }
 
-    return primary();
+    return call();
+}
+
+std::unique_ptr<Expr> Parser::call()
+{
+    auto expr = primary();
+
+    while (match({TokenType::LeftParen}))
+    {
+        std::vector<std::unique_ptr<Expr>> args;
+        if (peek().type != TokenType::RightParen)
+        {
+            args = arguments();
+        }
+
+        const auto& paren = consume(TokenType::RightParen, "Expecting ')' after arguments");
+        expr = std::make_unique<Expr::Call>(std::move(expr), paren, std::move(args));
+    }
+
+    return expr;
 }
 
 std::unique_ptr<Expr> Parser::primary()
@@ -282,6 +301,21 @@ std::unique_ptr<Expr> Parser::primary()
     }
 
     throw Error(peek(), "Expecting expression");
+}
+
+std::vector<std::unique_ptr<Expr>> Parser::arguments()
+{
+    std::vector<std::unique_ptr<Expr>> args;
+    args.emplace_back(expression());
+
+    while (match({TokenType::Comma}))
+    {
+        args.emplace_back(expression());
+        if (args.size() >= 255)
+            error(peek(), "Can't have more than 255 arguments");
+    }
+
+    return args;
 }
 
 bool Parser::isAtEnd() const

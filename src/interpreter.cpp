@@ -1,10 +1,15 @@
-#include "environment.hpp"
 #include "pch.hpp"
 
+#include "environment.hpp"
 #include "error.hpp"
 #include "interpreter.hpp"
 #include "token.hpp"
 #include "value.hpp"
+
+#include <chrono>
+
+namespace
+{
 
 class Finally
 {
@@ -15,6 +20,34 @@ public:
 private:
     std::function<void()> m_func;
 };
+
+class NativeFunction : public ICallable
+{
+public:
+    std::string toString() const override { return "<native func>"; }
+};
+
+class Clock : public NativeFunction
+{
+public:
+    Value call(Interpreter& interpreter, const std::vector<Value>&) override
+    {
+        std::chrono::duration<double> duration = std::chrono::system_clock::now() - s_startTime;
+        return Value(duration.count());
+    }
+
+    int arity() const override { return 0; }
+
+private:
+    inline static auto s_startTime = std::chrono::system_clock::now();
+};
+
+} // namespace
+
+Interpreter::Interpreter()
+{
+    m_global->define("clock", Value(std::make_shared<Clock>()));
+}
 
 void Interpreter::interpret(const Stmt& stmt)
 {
@@ -125,6 +158,8 @@ Value Interpreter::eval(const Expr& expr)
         return eval(*assignExpr);
     if (const auto* logicalExpr = dynamic_cast<const Expr::Logical*>(&expr))
         return eval(*logicalExpr);
+    if (const auto* callExpr = dynamic_cast<const Expr::Call*>(&expr))
+        return eval(*callExpr);
 
     assert(0 && "unreachable");
     return Value();
@@ -249,8 +284,8 @@ Value Interpreter::eval(const Expr::Variable& expr)
 Value Interpreter::eval(const Expr::Assign& expr)
 {
     auto value = eval(*expr.value);
-    m_environment->assign(expr.name, value);
-    return value;
+    m_environment->assign(expr.name, std::move(value));
+    return m_environment->get(expr.name);
 }
 
 Value Interpreter::eval(const Expr::Logical& expr)
@@ -272,6 +307,26 @@ Value Interpreter::eval(const Expr::Logical& expr)
     {
         assert(0 && "unreachable");
     }
+}
+
+Value Interpreter::eval(const Expr::Call& expr)
+{
+    auto callee = eval(*expr.callee);
+
+    std::vector<Value> arguments;
+    for (const auto& arg : expr.arguments)
+        arguments.emplace_back(eval(*arg));
+
+    if (!callee.isCallable())
+        throw RuntimeError(expr.paren, "Value is not callable");
+
+    const int arity = callee.getCallable()->arity();
+    if (arity != arguments.size())
+    {
+        throw RuntimeError(expr.paren, fmt::format("Expected {} arguments but got {}.", arity, arguments.size()));
+    }
+
+    return callee.getCallable()->call(*this, arguments);
 }
 
 bool Interpreter::isTruthy(const Value& value)

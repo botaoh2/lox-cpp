@@ -2,7 +2,7 @@
 
 #include "error.hpp"
 
-Value Environment::get(const Token& name) const
+const Value& Environment::get(const Token& name) const
 {
     if (auto it = m_values.find(name.lexeme); it != m_values.end())
         return it->second;
