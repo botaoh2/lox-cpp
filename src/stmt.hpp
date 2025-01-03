@@ -1,6 +1,7 @@
 #pragma once
 
 #include "expr.hpp"
+#include "token.hpp"
 
 class Stmt
 {
@@ -13,6 +14,7 @@ public:
     class While;
     class For;
     class Fun;
+    class Return;
 
     virtual ~Stmt() = default;
 };
@@ -114,4 +116,16 @@ public:
     Token name;
     std::vector<Token> params;
     std::vector<std::unique_ptr<Stmt>> body;
+};
+
+class Stmt::Return : public Stmt
+{
+public:
+    Return(const Token& keyword, std::unique_ptr<Expr> value = nullptr) : keyword(keyword), value(std::move(value))
+    {
+        assert(keyword.type == TokenType::Return);
+    }
+
+    Token keyword;
+    std::unique_ptr<Expr> value;
 };

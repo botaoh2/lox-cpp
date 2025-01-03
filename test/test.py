@@ -92,6 +92,13 @@ class Basic(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, read_file('function.txt'))
         self.assertEqual(result.stderr, '')
+    
+    def test_fib(self):
+        result = run_script('fib.lox')
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, read_file('fib.txt'))
+        self.assertEqual(result.stderr, '')
 
 if __name__ == '__main__':
     unittest.main()

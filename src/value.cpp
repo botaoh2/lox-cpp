@@ -12,7 +12,15 @@ Value LoxFunction::call(Interpreter& interpreter, const std::vector<Value>& argu
         env->define(declaration.params[i].lexeme, arguments[i]);
     }
 
-    interpreter.executeBlock(declaration.body, env);
+    try
+    {
+        interpreter.executeBlock(declaration.body, env);
+    }
+    catch (const Return& returnValue)
+    {
+        return returnValue.value;
+    }
+
     return Value();
 }
 

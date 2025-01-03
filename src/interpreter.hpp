@@ -5,6 +5,13 @@
 #include "stmt.hpp"
 #include "value.hpp"
 
+struct Return
+{
+    Return(const Value& value) : value(value) {}
+
+    Value value;
+};
+
 class Interpreter
 {
 public:
@@ -24,6 +31,7 @@ private:
     void exec(const Stmt::While& stmt);
     void exec(const Stmt::For& stmt);
     void exec(const Stmt::Fun& stmt);
+    void exec(const Stmt::Return& stmt);
 
     Value eval(const Expr& expr);
     Value eval(const Expr::Binary& expr);
