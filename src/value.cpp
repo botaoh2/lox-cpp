@@ -1,11 +1,17 @@
 #include "pch.hpp"
 
+#include "environment.hpp"
 #include "interpreter.hpp"
 #include "value.hpp"
 
+LoxFunction::LoxFunction(const Stmt::Fun& declaration, std::shared_ptr<Environment> closure)
+    : declaration(declaration), closure(closure)
+{
+}
+
 Value LoxFunction::call(Interpreter& interpreter, const std::vector<Value>& arguments)
 {
-    auto env = std::make_shared<Environment>(interpreter.m_global);
+    auto env = std::make_shared<Environment>(closure);
 
     for (int i = 0; i < arguments.size(); i++)
     {

@@ -15,6 +15,7 @@ enum class ValueType
 
 class Interpreter;
 class Value;
+class Environment;
 
 class ICallable
 {
@@ -28,13 +29,14 @@ public:
 class LoxFunction : public ICallable
 {
 public:
-    LoxFunction(const Stmt::Fun& declaration) : declaration(declaration) {}
+    LoxFunction(const Stmt::Fun& declaration, std::shared_ptr<Environment> closure);
 
     std::string toString() const override { return declaration.name.lexeme; }
     int arity() const override { return declaration.params.size(); }
     Value call(Interpreter& interpreter, const std::vector<Value>& arguments) override;
 
     const Stmt::Fun& declaration;
+    std::shared_ptr<Environment> closure;
 };
 
 class Value

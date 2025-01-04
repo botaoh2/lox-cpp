@@ -136,7 +136,7 @@ void Interpreter::exec(const Stmt::For& stmt)
 
 void Interpreter::exec(const Stmt::Fun& stmt)
 {
-    auto functionValue = Value(std::make_shared<LoxFunction>(stmt));
+    auto functionValue = Value(std::make_shared<LoxFunction>(stmt, m_environment));
     m_environment->define(stmt.name.lexeme, functionValue);
 }
 
