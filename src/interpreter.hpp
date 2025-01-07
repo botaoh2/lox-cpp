@@ -5,6 +5,8 @@
 #include "stmt.hpp"
 #include "value.hpp"
 
+#include <unordered_map>
+
 struct Return
 {
     Return(const Value& value) : value(value) {}
@@ -20,6 +22,7 @@ public:
 
     void interpret(const Stmt& stmt);
     Value interpret(const Expr& expr);
+    void resolve(const Expr& expr, int scope);
 
 private:
     void exec(const Stmt& stmt);
@@ -51,6 +54,9 @@ private:
     void checkNumber(const Token& token, const Value& left, const Value& right);
     void checkString(const Token& token, const Value& value);
 
+    Value lookupVariable(const Token& name, const Expr& expr);
+
     std::shared_ptr<Environment> m_global = std::make_shared<Environment>();
     std::shared_ptr<Environment> m_environment = m_global;
+    std::unordered_map<const Expr*, int> m_locals;
 };

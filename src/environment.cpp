@@ -34,3 +34,35 @@ void Environment::assign(const Token& name, const Value& value)
 
     throw RuntimeError(name, fmt::format("Undefined variable '{}'", name.lexeme));
 }
+
+const Value& Environment::getAt(int distance, const std::string& name) const
+{
+    return ancestor(distance).m_values.at(name);
+}
+
+void Environment::assignAt(int distance, const std::string& name, const Value& value)
+{
+    ancestor(distance).m_values.at(name) = value;
+}
+
+Environment& Environment::ancestor(int distance)
+{
+    assert(distance >= 0);
+
+    Environment* env = this;
+    for (int i = 0; i < distance; i++)
+        env = env->m_parent.get();
+
+    return *env;
+}
+
+const Environment& Environment::ancestor(int distance) const
+{
+    assert(distance >= 0);
+
+    const Environment* env = this;
+    for (int i = 0; i < distance; i++)
+        env = env->m_parent.get();
+
+    return *env;
+}

@@ -297,14 +297,20 @@ Value Interpreter::eval(const Expr::Unary& expr)
 
 Value Interpreter::eval(const Expr::Variable& expr)
 {
-    return m_environment->get(expr.name);
+    return lookupVariable(expr.name, expr);
 }
 
 Value Interpreter::eval(const Expr::Assign& expr)
 {
     auto value = eval(*expr.value);
-    m_environment->assign(expr.name, std::move(value));
-    return m_environment->get(expr.name);
+
+    auto it = m_locals.find(&expr);
+    if (it == m_locals.end())
+        m_global->assign(expr.name, value);
+    else
+        m_environment->assignAt(it->second, expr.name.lexeme, value);
+
+    return value;
 }
 
 Value Interpreter::eval(const Expr::Logical& expr)
@@ -389,4 +395,18 @@ void Interpreter::checkString(const Token& token, const Value& value)
 {
     if (!value.isString())
         throw RuntimeError(token, "Operand must be a string.");
+}
+
+void Interpreter::resolve(const Expr& expr, int scope)
+{
+    m_locals[&expr] = scope;
+}
+
+Value Interpreter::lookupVariable(const Token& name, const Expr& expr)
+{
+    auto it = m_locals.find(&expr);
+    if (it == m_locals.end())
+        return m_global->get(name);
+    else
+        return m_environment->getAt(it->second, name.lexeme);
 }

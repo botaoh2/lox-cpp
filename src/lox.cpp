@@ -1,17 +1,19 @@
-#include "error.hpp"
 #include "pch.hpp"
 
 #include "lox.hpp"
 
+#include "error.hpp"
 #include "interpreter.hpp"
 #include "parser.hpp"
 #include "printer.hpp"
+#include "resolver.hpp"
 #include "scanner.hpp"
 
 #include <fstream>
 #include <sstream>
 
 Interpreter interpreter;
+Resolver resolver(interpreter);
 
 bool hadError = false;
 
@@ -19,6 +21,10 @@ static void run(std::string_view code)
 {
     auto tokens = Scanner::scanTokens(code);
     auto statements = Parser::parse(tokens);
+    resolver.resolve(statements);
+    if (hadError)
+        return;
+
     try
     {
         for (const auto& stmt : statements)

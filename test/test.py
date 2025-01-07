@@ -106,6 +106,13 @@ class Basic(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, read_file('closure.txt'))
         self.assertEqual(result.stderr, '')
+    
+    def test_resolve(self):
+        result = run_script('resolve.lox')
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, read_file('resolve.txt'))
+        self.assertEqual(result.stderr, '')
 
 if __name__ == '__main__':
     unittest.main()

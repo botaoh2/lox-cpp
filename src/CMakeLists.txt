@@ -7,6 +7,7 @@ lox.cpp
 main.cpp
 parser.cpp
 printer.cpp
+resolver.cpp
 scanner.cpp
 token.cpp
 value.cpp
