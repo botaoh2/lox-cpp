@@ -11,9 +11,7 @@ class Interpreter;
 class Resolver
 {
 public:
-    Resolver(Interpreter& interpreter);
-
-    void resolve(const std::vector<std::unique_ptr<Stmt>>& statements);
+    static void resolve(Interpreter& interpreter, const std::vector<std::unique_ptr<Stmt>>& statements);
 
 private:
     enum class FunctionType
@@ -21,6 +19,10 @@ private:
         None,
         Function,
     };
+
+    Resolver(Interpreter& interpreter);
+
+    void resolve(const std::vector<std::unique_ptr<Stmt>>& statements);
 
     void resolveStmt(const Stmt& stmt);
     void resolveExpressionStmt(const Stmt::Expression& stmt);

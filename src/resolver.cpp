@@ -4,6 +4,12 @@
 #include "lox.hpp"
 #include "resolver.hpp"
 
+void Resolver::resolve(Interpreter& interpreter, const std::vector<std::unique_ptr<Stmt>>& statements)
+{
+    Resolver resolver(interpreter);
+    resolver.resolve(statements);
+}
+
 Resolver::Resolver(Interpreter& interpreter) : interpreter(interpreter)
 {
 }

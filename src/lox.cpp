@@ -13,7 +13,6 @@
 #include <sstream>
 
 Interpreter interpreter;
-Resolver resolver(interpreter);
 
 bool hadError = false;
 
@@ -21,7 +20,7 @@ static void run(std::string_view code)
 {
     auto tokens = Scanner::scanTokens(code);
     auto statements = Parser::parse(tokens);
-    resolver.resolve(statements);
+    Resolver::resolve(interpreter, statements);
     if (hadError)
         return;
 
