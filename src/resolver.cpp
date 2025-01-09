@@ -40,6 +40,8 @@ void Resolver::resolveStmt(const Stmt& stmt)
         return resolveFunStmt(*funStmt);
     if (const auto* returnStmt = dynamic_cast<const Stmt::Return*>(&stmt))
         return resolveReturnStmt(*returnStmt);
+    if (const auto* classStmt = dynamic_cast<const Stmt::Class*>(&stmt))
+        return resolveClassStmt(*classStmt);
 }
 
 void Resolver::resolveExpressionStmt(const Stmt::Expression& stmt)
@@ -109,6 +111,13 @@ void Resolver::resolveReturnStmt(const Stmt::Return& stmt)
         resolveExpr(*stmt.value);
 }
 
+void Resolver::resolveClassStmt(const Stmt::Class& stmt)
+{
+    declare(stmt.name);
+    define(stmt.name);
+    // TODO
+}
+
 void Resolver::resolveExpr(const Expr& expr)
 {
     if (const auto* binaryExpr = dynamic_cast<const Expr::Binary*>(&expr))
@@ -127,6 +136,8 @@ void Resolver::resolveExpr(const Expr& expr)
         return resolveLogicalExpr(*logicalExpr);
     if (const auto* callExpr = dynamic_cast<const Expr::Call*>(&expr))
         return resolveCallExpr(*callExpr);
+    if (const auto* getExpr = dynamic_cast<const Expr::Get*>(&expr))
+        return resolveGetExpr(*getExpr);
 }
 
 void Resolver::resolveBinaryExpr(const Expr::Binary& expr)
@@ -182,6 +193,17 @@ void Resolver::resolveCallExpr(const Expr::Call& expr)
 
     for (const auto& arg : expr.arguments)
         resolveExpr(*arg);
+}
+
+void Resolver::resolveGetExpr(const Expr::Get& expr)
+{
+    resolveExpr(*expr.object);
+}
+
+void Resolver::resolveSetExpr(const Expr::Set& expr)
+{
+    resolveExpr(*expr.object);
+    resolveExpr(*expr.value);
 }
 
 void Resolver::beginScope()

@@ -35,6 +35,7 @@ private:
     void exec(const Stmt::For& stmt);
     void exec(const Stmt::Fun& stmt);
     void exec(const Stmt::Return& stmt);
+    void exec(const Stmt::Class& stmt);
 
     Value eval(const Expr& expr);
     Value eval(const Expr::Binary& expr);
@@ -45,6 +46,8 @@ private:
     Value eval(const Expr::Assign& expr);
     Value eval(const Expr::Logical& expr);
     Value eval(const Expr::Call& expr);
+    Value eval(const Expr::Get& expr);
+    Value eval(const Expr::Set& expr);
 
     void executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env);
 

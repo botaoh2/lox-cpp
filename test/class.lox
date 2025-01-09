@@ -1,0 +1,12 @@
+
+class Test {
+    sing() {
+        print "sing";
+    }
+}
+
+var t = Test();
+print Test;
+print t;
+t.hello = "hello";
+print t.hello;

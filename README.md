@@ -7,7 +7,7 @@ A C++ implementation of the Lox programming language from Robert Nystrom's book,
 * Fully functional interpreter for the Lox programming language.
 * Supports:
     * Variables, control flow (if, while, for).
-    * Functions, closures, and classes(TODO).
+    * Functions, closures, and classes.
     * Dynamic typing and runtime error checking.
     * Lexical scoping with proper variable resolution.
 * Error reporting for syntax and runtime errors.

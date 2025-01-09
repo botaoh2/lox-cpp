@@ -46,11 +46,37 @@ std::vector<std::unique_ptr<Stmt>> Parser::block()
 
 std::unique_ptr<Stmt> Parser::declaration()
 {
+    if (match({TokenType::Class}))
+        return classDeclaration();
     if (match({TokenType::Fun}))
         return funDeclaration();
     if (match({TokenType::Var}))
         return varDeclaration();
     return statement();
+}
+
+std::unique_ptr<Stmt> Parser::classDeclaration()
+{
+    const auto& name = consume(TokenType::Identifier, "Expecting class name");
+    std::vector<std::unique_ptr<Stmt::Fun>> methods;
+    consume(TokenType::LeftBrace, "Expecting '{' before class body");
+    while (match({TokenType::Identifier}))
+    {
+        const Token& methodName = previous();
+        consume(TokenType::LeftParen, "Expecting '(' after method name.");
+        std::vector<Token> params;
+        if (peek().type != TokenType::RightParen)
+            params = parameters();
+        consume(TokenType::RightParen, "Expecting ')' after method parameters.");
+
+        consume(TokenType::LeftBrace, "Expecting '{' after function declaration.");
+        auto body = block();
+
+        methods.emplace_back(std::make_unique<Stmt::Fun>(methodName, std::move(params), std::move(body)));
+    }
+    consume(TokenType::RightBrace, "Expecting '}' after class body");
+
+    return std::make_unique<Stmt::Class>(name, std::move(methods));
 }
 
 std::unique_ptr<Stmt> Parser::funDeclaration()
@@ -196,6 +222,10 @@ std::unique_ptr<Expr> Parser::assignment()
         {
             return std::make_unique<Expr::Assign>(variableExpr->name, std::move(value));
         }
+        else if (auto getExpr = dynamic_cast<Expr::Get*>(left.get()); getExpr != nullptr)
+        {
+            return std::make_unique<Expr::Set>(std::move(getExpr->object), getExpr->name, std::move(value));
+        }
 
         error(equalToken, "Invalid assignment target");
     }
@@ -303,16 +333,28 @@ std::unique_ptr<Expr> Parser::call()
 {
     auto expr = primary();
 
-    while (match({TokenType::LeftParen}))
+    while (true)
     {
-        std::vector<std::unique_ptr<Expr>> args;
-        if (peek().type != TokenType::RightParen)
+        if (match({TokenType::LeftParen}))
         {
-            args = arguments();
-        }
+            std::vector<std::unique_ptr<Expr>> args;
+            if (peek().type != TokenType::RightParen)
+            {
+                args = arguments();
+            }
 
-        const auto& paren = consume(TokenType::RightParen, "Expecting ')' after arguments");
-        expr = std::make_unique<Expr::Call>(std::move(expr), paren, std::move(args));
+            const auto& paren = consume(TokenType::RightParen, "Expecting ')' after arguments");
+            expr = std::make_unique<Expr::Call>(std::move(expr), paren, std::move(args));
+        }
+        else if (match({TokenType::Dot}))
+        {
+            const Token& name = consume(TokenType::Identifier, "Expecting property name after '.'");
+            expr = std::make_unique<Expr::Get>(std::move(expr), name);
+        }
+        else
+        {
+            break;
+        }
     }
 
     return expr;

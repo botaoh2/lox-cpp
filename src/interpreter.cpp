@@ -79,6 +79,8 @@ void Interpreter::exec(const Stmt& stmt)
         return exec(*funStmt);
     if (const auto* returnStmt = dynamic_cast<const Stmt::Return*>(&stmt))
         return exec(*returnStmt);
+    if (const auto* classStmt = dynamic_cast<const Stmt::Class*>(&stmt))
+        return exec(*classStmt);
 
     assert(0 && "unreachable");
 }
@@ -149,6 +151,13 @@ void Interpreter::exec(const Stmt::Return& stmt)
     throw Return(value);
 }
 
+void Interpreter::exec(const Stmt::Class& stmt)
+{
+    m_environment->define(stmt.name.lexeme, Value());
+    auto clazz = std::make_shared<LoxClass>(stmt.name.lexeme);
+    m_environment->assign(stmt.name, Value(clazz));
+}
+
 void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env)
 {
     auto previous = m_environment;
@@ -179,6 +188,10 @@ Value Interpreter::eval(const Expr& expr)
         return eval(*logicalExpr);
     if (const auto* callExpr = dynamic_cast<const Expr::Call*>(&expr))
         return eval(*callExpr);
+    if (const auto* getExpr = dynamic_cast<const Expr::Get*>(&expr))
+        return eval(*getExpr);
+    if (const auto* setExpr = dynamic_cast<const Expr::Set*>(&expr))
+        return eval(*setExpr);
 
     assert(0 && "unreachable");
     return Value();
@@ -352,6 +365,26 @@ Value Interpreter::eval(const Expr::Call& expr)
     }
 
     return callee.getCallable()->call(*this, arguments);
+}
+
+Value Interpreter::eval(const Expr::Get& expr)
+{
+    auto object = eval(*expr.object);
+    if (object.isInstance())
+        return object.getInstance()->get(expr.name);
+
+    throw RuntimeError(expr.name, "Only instances have properties");
+}
+
+Value Interpreter::eval(const Expr::Set& expr)
+{
+    auto object = eval(*expr.object);
+    if (!object.isInstance())
+        throw RuntimeError(expr.name, "Only instances have fields.");
+
+    auto value = eval(*expr.value);
+    object.getInstance()->set(expr.name, value);
+    return value;
 }
 
 bool Interpreter::isTruthy(const Value& value)

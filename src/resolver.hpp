@@ -34,6 +34,7 @@ private:
     void resolveForStmt(const Stmt::For& stmt);
     void resolveFunStmt(const Stmt::Fun& stmt);
     void resolveReturnStmt(const Stmt::Return& stmt);
+    void resolveClassStmt(const Stmt::Class& stmt);
 
     void resolveExpr(const Expr& expr);
     void resolveBinaryExpr(const Expr::Binary& expr);
@@ -44,6 +45,8 @@ private:
     void resolveAssignExpr(const Expr::Assign& expr);
     void resolveLogicalExpr(const Expr::Logical& expr);
     void resolveCallExpr(const Expr::Call& expr);
+    void resolveGetExpr(const Expr::Get& expr);
+    void resolveSetExpr(const Expr::Set& expr);
 
     void beginScope();
     void endScope();

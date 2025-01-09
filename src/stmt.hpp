@@ -15,6 +15,7 @@ public:
     class For;
     class Fun;
     class Return;
+    class Class;
 
     virtual ~Stmt() = default;
 };
@@ -128,4 +129,15 @@ public:
 
     Token keyword;
     std::unique_ptr<Expr> value;
+};
+
+class Stmt::Class : public Stmt
+{
+public:
+    Class(const Token& name, std::vector<std::unique_ptr<Stmt::Fun>> methods) : name(name), methods(std::move(methods))
+    {
+    }
+
+    Token name;
+    std::vector<std::unique_ptr<Stmt::Fun>> methods;
 };

@@ -29,6 +29,7 @@ private:
     std::vector<std::unique_ptr<Stmt>> block();
 
     std::unique_ptr<Stmt> declaration();
+    std::unique_ptr<Stmt> classDeclaration();
     std::unique_ptr<Stmt> funDeclaration();
     std::unique_ptr<Stmt> varDeclaration();
     std::unique_ptr<Stmt> statement();

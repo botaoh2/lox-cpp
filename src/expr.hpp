@@ -15,6 +15,8 @@ public:
     class Assign;
     class Logical;
     class Call;
+    class Get;
+    class Set;
 
     virtual ~Expr() = default;
     virtual void accept(ExprVisitor& visitor) const = 0;
@@ -133,4 +135,30 @@ public:
     std::unique_ptr<Expr> callee;
     Token paren;
     std::vector<std::unique_ptr<Expr>> arguments;
+};
+
+class Expr::Get : public Expr
+{
+public:
+    Get(std::unique_ptr<Expr> object, const Token& name) : object(std::move(object)), name(name) {}
+
+    void accept(ExprVisitor& visitor) const override {}
+
+    std::unique_ptr<Expr> object;
+    Token name;
+};
+
+class Expr::Set : public Expr
+{
+public:
+    Set(std::unique_ptr<Expr> object, const Token& name, std::unique_ptr<Expr> value)
+        : object(std::move(object)), name(name), value(std::move(value))
+    {
+    }
+
+    void accept(ExprVisitor& visitor) const override {}
+
+    std::unique_ptr<Expr> object;
+    Token name;
+    std::unique_ptr<Expr> value;
 };
