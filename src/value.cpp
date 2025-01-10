@@ -31,6 +31,13 @@ Value LoxFunction::call(Interpreter& interpreter, const std::vector<Value>& argu
     return Value();
 }
 
+LoxFunction LoxFunction::bind(const Value& instance) const
+{
+    auto env = std::make_shared<Environment>(closure);
+    env->define("this", instance);
+    return LoxFunction(declaration, env);
+}
+
 int LoxClass::arity() const
 {
     return 0;
@@ -50,6 +57,11 @@ Value LoxInstance::get(const Token& name) const
 {
     if (auto it = fields.find(name.lexeme); it != fields.end())
         return it->second;
+
+    if (auto it = clazz.methods.find(name.lexeme); it != clazz.methods.end())
+    {
+        return Value(it->second);
+    }
 
     throw RuntimeError(name, fmt::format("Undefined property '{}'", name.lexeme));
 }

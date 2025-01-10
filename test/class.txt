@@ -1,3 +1,4 @@
 <class Test>
 <Test instance>
 hello
+sing

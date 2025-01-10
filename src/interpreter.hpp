@@ -48,6 +48,7 @@ private:
     Value eval(const Expr::Call& expr);
     Value eval(const Expr::Get& expr);
     Value eval(const Expr::Set& expr);
+    Value eval(const Expr::This& expr);
 
     void executeBlock(const std::vector<std::unique_ptr<Stmt>>& statements, std::shared_ptr<Environment> env);
 

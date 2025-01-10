@@ -18,6 +18,7 @@ private:
     {
         None,
         Function,
+        Method,
     };
 
     Resolver(Interpreter& interpreter);
@@ -47,6 +48,7 @@ private:
     void resolveCallExpr(const Expr::Call& expr);
     void resolveGetExpr(const Expr::Get& expr);
     void resolveSetExpr(const Expr::Set& expr);
+    void resolveThisExpr(const Expr::This& expr);
 
     void beginScope();
     void endScope();

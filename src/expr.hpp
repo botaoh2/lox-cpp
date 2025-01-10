@@ -17,6 +17,7 @@ public:
     class Call;
     class Get;
     class Set;
+    class This;
 
     virtual ~Expr() = default;
     virtual void accept(ExprVisitor& visitor) const = 0;
@@ -161,4 +162,14 @@ public:
     std::unique_ptr<Expr> object;
     Token name;
     std::unique_ptr<Expr> value;
+};
+
+class Expr::This : public Expr
+{
+public:
+    This(const Token& keyword) : keyword(keyword) {}
+
+    void accept(ExprVisitor& visitor) const override {}
+
+    Token keyword;
 };

@@ -120,6 +120,13 @@ class Basic(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, read_file('class.txt'))
         self.assertEqual(result.stderr, '')
+    
+    def test_cake(self):
+        result = run_script('cake.lox')
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, read_file('cake.txt'))
+        self.assertEqual(result.stderr, '')
 
 if __name__ == '__main__':
     unittest.main()

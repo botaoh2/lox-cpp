@@ -10,3 +10,4 @@ print Test;
 print t;
 t.hello = "hello";
 print t.hello;
+t.sing();

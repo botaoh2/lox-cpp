@@ -115,7 +115,16 @@ void Resolver::resolveClassStmt(const Stmt::Class& stmt)
 {
     declare(stmt.name);
     define(stmt.name);
-    // TODO
+
+    beginScope();
+    m_scopes.back().insert({"this", true});
+
+    for (const auto& method : stmt.methods)
+    {
+        resolveFunction(*method, FunctionType::Method);
+    }
+
+    endScope();
 }
 
 void Resolver::resolveExpr(const Expr& expr)
@@ -138,6 +147,8 @@ void Resolver::resolveExpr(const Expr& expr)
         return resolveCallExpr(*callExpr);
     if (const auto* getExpr = dynamic_cast<const Expr::Get*>(&expr))
         return resolveGetExpr(*getExpr);
+    if (const auto* thisExpr = dynamic_cast<const Expr::This*>(&expr))
+        return resolveThisExpr(*thisExpr);
 }
 
 void Resolver::resolveBinaryExpr(const Expr::Binary& expr)
@@ -204,6 +215,11 @@ void Resolver::resolveSetExpr(const Expr::Set& expr)
 {
     resolveExpr(*expr.object);
     resolveExpr(*expr.value);
+}
+
+void Resolver::resolveThisExpr(const Expr::This& expr)
+{
+    resolveLocal(expr, expr.keyword);
 }
 
 void Resolver::beginScope()

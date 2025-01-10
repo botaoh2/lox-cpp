@@ -154,7 +154,14 @@ void Interpreter::exec(const Stmt::Return& stmt)
 void Interpreter::exec(const Stmt::Class& stmt)
 {
     m_environment->define(stmt.name.lexeme, Value());
-    auto clazz = std::make_shared<LoxClass>(stmt.name.lexeme);
+
+    std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods;
+    for (const auto& funStmt : stmt.methods)
+    {
+        methods[funStmt->name.lexeme] = std::make_shared<LoxFunction>(*funStmt, m_environment);
+    }
+
+    auto clazz = std::make_shared<LoxClass>(stmt.name.lexeme, std::move(methods));
     m_environment->assign(stmt.name, Value(clazz));
 }
 
@@ -192,6 +199,8 @@ Value Interpreter::eval(const Expr& expr)
         return eval(*getExpr);
     if (const auto* setExpr = dynamic_cast<const Expr::Set*>(&expr))
         return eval(*setExpr);
+    if (const auto* thisExpr = dynamic_cast<const Expr::This*>(&expr))
+        return eval(*thisExpr);
 
     assert(0 && "unreachable");
     return Value();
@@ -371,7 +380,18 @@ Value Interpreter::eval(const Expr::Get& expr)
 {
     auto object = eval(*expr.object);
     if (object.isInstance())
-        return object.getInstance()->get(expr.name);
+    {
+        auto instance = object.getInstance();
+        if (auto it = instance->fields.find(expr.name.lexeme); it != instance->fields.end())
+            return it->second;
+
+        if (auto it = instance->clazz.methods.find(expr.name.lexeme); it != instance->clazz.methods.end())
+        {
+            return Value(std::make_shared<LoxFunction>(it->second->bind(object)));
+        }
+
+        throw RuntimeError(expr.name, fmt::format("Undefined property '{}'", expr.name.lexeme));
+    }
 
     throw RuntimeError(expr.name, "Only instances have properties");
 }
@@ -385,6 +405,11 @@ Value Interpreter::eval(const Expr::Set& expr)
     auto value = eval(*expr.value);
     object.getInstance()->set(expr.name, value);
     return value;
+}
+
+Value Interpreter::eval(const Expr::This& expr)
+{
+    return lookupVariable(expr.keyword, expr);
 }
 
 bool Interpreter::isTruthy(const Value& value)

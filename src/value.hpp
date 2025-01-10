@@ -17,6 +17,7 @@ enum class ValueType
 class Interpreter;
 class Value;
 class Environment;
+class LoxInstance;
 
 class ICallable
 {
@@ -35,6 +36,7 @@ public:
     std::string toString() const override { return fmt::format("<fun {}>", declaration.name.lexeme); }
     int arity() const override { return declaration.params.size(); }
     Value call(Interpreter& interpreter, const std::vector<Value>& arguments) override;
+    LoxFunction bind(const Value& instance) const;
 
     const Stmt::Fun& declaration;
     std::shared_ptr<Environment> closure;
@@ -43,7 +45,10 @@ public:
 class LoxClass : public ICallable
 {
 public:
-    LoxClass(const std::string& name) : name(name) {}
+    LoxClass(const std::string& name, std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods)
+        : name(name), methods(std::move(methods))
+    {
+    }
 
     std::string toString() const override { return fmt::format("<class {}>", name); }
     int arity() const override;
@@ -51,6 +56,7 @@ public:
 
 public:
     std::string name;
+    const std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods;
 };
 
 class LoxInstance
